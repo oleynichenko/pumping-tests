@@ -8,7 +8,7 @@ const mockQuestions = [
       "right": 0.1715
     },
     "options": {
-    "a": "Создавать с помощью литерала функции",
+      "a": "Создавать с помощью литерала функции",
       "b": "Присваивать переменным",
       "c": "Присваивать элементам массивов",
       "d": "Присваивать свойствам других объектов",
@@ -110,4 +110,4 @@ const mockQuestions = [
   },
 ];
 
-export default mockQuestion;
+export default mockQuestions;
