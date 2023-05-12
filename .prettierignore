@@ -1,0 +1,28 @@
+# Ignore everything but a few: https://stackoverflow.com/a/987162/2725711
+# Ignore all
+*
+
+# Except for directories
+!*/
+
+# and except for specific file types
+!*.json
+!*.md
+!*.js
+!*.jsx
+!*.html
+!*.css
+!*.yml
+
+# Specific JSON files to ignore
+package.json
+package-lock.json
+
+# Output directories
+build/
+coverage/
+e2e/results/
+e2e/screenshots/
+e2e/videos/
+
+.vscode/
