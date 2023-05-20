@@ -1,18 +1,84 @@
-import React, {useEffect, useState} from 'react';
-import mockTest from '../mock/test';
-import {Box, Button, Checkbox, Container, List, ListItem, ListItemIcon, ListItemText, Typography,} from '@mui/material';
-import mockQuestions from '../mock/question';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Container, Typography } from '@mui/material';
+import useRealm from '../hooks/useRealm';
+import Questions from './Questions';
+import getTestName from '../utils/getTestName';
+import { RequestStatus } from '../utils/request-status';
 
 function Test() {
   const [test, setTest] = useState();
+  const [testResults, setTestResults] = useState();
+  const [status, setStatus] = useState(RequestStatus.Undone);
+  const { testsCol, questionsCol } = useRealm();
+
+  const checkTest = () => {
+    setTestResults(
+      //   {
+      //   '13': ['a', 'b', 'd'],
+      //   '8': ['b', 'c'],
+      //   '23': ['a', 'c']
+      // }
+      {
+        wrongAnsweredQuestionIds: [13, 23],
+      }
+    );
+  };
+
+  const reloadTest = () => {
+    setTestResults(undefined);
+  };
 
   useEffect(() => {
-    const data = {
-      ...mockTest,
-      questions: mockQuestions,
-    };
-    setTest(data);
-  }, []);
+    if (testsCol && status === RequestStatus.Undone) {
+      const testName = getTestName();
+
+      if (!testName) {
+        setStatus(RequestStatus.Done);
+      }
+
+      setStatus(RequestStatus.Waiting);
+
+      const testPipeline = [
+        { $match: { 'links.permalink': testName } },
+        { $unwind: `$links` },
+        { $match: { 'links.permalink': testName } },
+        {
+          $project: {
+            title: 1,
+            description: 1,
+            links: 1,
+            questions: 1,
+          },
+        },
+      ];
+
+      const testRequest = testsCol.aggregate(testPipeline);
+
+      testRequest.then(([testData]) => {
+        const {
+          questions: { themes },
+          links: { questionsQuantity },
+        } = testData;
+
+        return questionsCol
+          .aggregate([
+            {
+              $match: { themes: { $in: themes } },
+            },
+            {
+              $sample: { size: questionsQuantity },
+            },
+            {
+              $sort: { id: 1 },
+            },
+          ])
+          .then((questionsData) => {
+            setTest({ ...testData, questionsData });
+            setStatus(RequestStatus.Done);
+          });
+      });
+    }
+  }, [testsCol]);
 
   if (!test) {
     return null;
@@ -20,7 +86,7 @@ function Test() {
 
   return (
     <Container maxWidth="md" sx={{ py: 10 }}>
-      <Box component="header" sx={{ mb: 4 }}>
+      <Box component="header" sx={{ mb: 5 }}>
         <Typography variant="overline">Тест</Typography>
         <Typography component="h1" variant="h3" sx={{ mb: 1.5 }}>
           {test.title}
@@ -32,40 +98,24 @@ function Test() {
           не доуказали хотя бы один правильный ответ.
         </Typography>
       </Box>
-      <List component="ul" sx={{ mb: 4 }}>
-        {test.questions &&
-          test.questions.map((question) => {
-            return (
-              <>
-                <ListItem key={question.id} sx={{ p: 0, pb: 0.5 }}>
-                  <ListItemText primary={question.wording} />
-                </ListItem>
-                <List
-                  component="ul"
-                  disablePadding
-                  dense
-                  sx={{ pl: 1, mb: 2.5 }}
-                >
-                  {Object.entries(question.options).map((value) => {
-                    const [variant, text] = value;
-
-                    return (
-                      <ListItem key={variant} sx={{ p: 0 }}>
-                        <ListItemIcon sx={{ minWidth: 40 }}>
-                          <Checkbox size="small" />
-                        </ListItemIcon>
-                        <ListItemText primary={text} />
-                      </ListItem>
-                    );
-                  })}
-                </List>
-              </>
-            );
-          })}
-      </List>
-      <Box>
-        <Button variant="contained">Оправить на проверку</Button>
-      </Box>
+      <Questions
+        sx={{ mb: 4 }}
+        questions={test.questionsData}
+        wrongAnsweredQuestionIds={
+          testResults && testResults.wrongAnsweredQuestionIds
+        }
+        answers={testResults}
+        isChecked={!!testResults}
+      />
+      {!!testResults ? (
+        <Button variant="contained" onClick={reloadTest}>
+          Пересдать
+        </Button>
+      ) : (
+        <Button variant="contained" onClick={checkTest}>
+          Оправить на проверку
+        </Button>
+      )}
     </Container>
   );
 }
