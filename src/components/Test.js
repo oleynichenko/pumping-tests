@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Box, Button, Container } from '@mui/material';
 import useRealm from '../hooks/useRealm';
 import Questions from './Questions';
 import getTestName from '../utils/getTestName';
 import { RequestStatus } from '../utils/request-status';
+import TestHeader from './TestHeader';
+import TestResultHeader from './TestResultHeader';
 
 function Test() {
   const [test, setTest] = useState();
@@ -87,16 +89,11 @@ function Test() {
   return (
     <Container maxWidth="md" sx={{ py: 10 }}>
       <Box component="header" sx={{ mb: 5 }}>
-        <Typography variant="overline">Тест</Typography>
-        <Typography component="h1" variant="h3" sx={{ mb: 1.5 }}>
-          {test.title}
-        </Typography>
-        <Typography variant="subtitle1">
-          В одном вопросе может быть несколько правильных ответов. Правильные
-          ответы повышают, а неправильные — уменьшают оценку. После проверки
-          вопрос будет выделен красным, если вы указали хотя бы один лишний или
-          не доуказали хотя бы один правильный ответ.
-        </Typography>
+        {!testResults ? (
+          <TestHeader title={test.title} />
+        ) : (
+          <TestResultHeader title={test.title} />
+        )}
       </Box>
       <Questions
         sx={{ mb: 4 }}
@@ -107,13 +104,13 @@ function Test() {
         answers={testResults}
         isChecked={!!testResults}
       />
-      {!!testResults ? (
-        <Button variant="contained" onClick={reloadTest}>
-          Пересдать
-        </Button>
-      ) : (
+      {!testResults ? (
         <Button variant="contained" onClick={checkTest}>
           Оправить на проверку
+        </Button>
+      ) : (
+        <Button variant="contained" onClick={reloadTest}>
+          Пересдать
         </Button>
       )}
     </Container>
