@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Container } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import useRealm from '../hooks/useRealm';
 import Questions from './Questions';
 import getTestName from '../utils/getTestName';
@@ -11,23 +11,13 @@ function Test() {
   const [test, setTest] = useState();
   const [testResults, setTestResults] = useState();
   const [status, setStatus] = useState(RequestStatus.Undone);
-  const { testsCol, questionsCol } = useRealm();
-
-  const checkTest = () => {
-    setTestResults(
-      //   {
-      //   '13': ['a', 'b', 'd'],
-      //   '8': ['b', 'c'],
-      //   '23': ['a', 'c']
-      // }
-      {
-        wrongAnsweredQuestionIds: [13, 23],
-      }
-    );
-  };
-
-  const reloadTest = () => {
-    setTestResults(undefined);
+  const { user, testsCol, questionsCol } = useRealm();
+  // console.log('testResults', testResults);
+  const checkTest = (results) => {
+    user.functions.getTestResult(results).then((data) => {
+      setTestResults(data)
+      console.log(data);
+    });
   };
 
   useEffect(() => {
@@ -56,11 +46,15 @@ function Test() {
 
       const testRequest = testsCol.aggregate(testPipeline);
 
-      testRequest.then(([testData]) => {
+      testRequest.then((testData) => {
+        if (!testData || testData.length === 0) {
+          return;
+        }
+
         const {
           questions: { themes },
           links: { questionsQuantity },
-        } = testData;
+        } = testData[0];
 
         return questionsCol
           .aggregate([
@@ -75,7 +69,7 @@ function Test() {
             },
           ])
           .then((questionsData) => {
-            setTest({ ...testData, questionsData });
+            setTest({ ...testData[0], questionsData });
             setStatus(RequestStatus.Done);
           });
       });
@@ -92,27 +86,20 @@ function Test() {
         {!testResults ? (
           <TestHeader title={test.title} />
         ) : (
-          <TestResultHeader title={test.title} />
+          <TestResultHeader
+            title={test.title}
+            result={testResults}
+          />
         )}
       </Box>
       <Questions
-        sx={{ mb: 4 }}
         questions={test.questionsData}
         wrongAnsweredQuestionIds={
-          testResults && testResults.wrongAnsweredQuestionIds
+          testResults && testResults.wrongQuestionsIds
         }
-        answers={testResults}
-        isChecked={!!testResults}
+        onSubmit={checkTest}
+        onReset={() => setTestResults(undefined)}
       />
-      {!testResults ? (
-        <Button variant="contained" onClick={checkTest}>
-          Оправить на проверку
-        </Button>
-      ) : (
-        <Button variant="contained" onClick={reloadTest}>
-          Пересдать
-        </Button>
-      )}
     </Container>
   );
 }

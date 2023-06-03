@@ -1,7 +1,7 @@
 import React from 'react';
 import { Checkbox, FormControlLabel } from '@mui/material';
 
-function Option({ text, color, isChecked, onCheck }) {
+function Option({ text, isChecked, isDisabled, color, onCheck }) {
   return (
     <FormControlLabel
       sx={{
@@ -17,10 +17,9 @@ function Option({ text, color, isChecked, onCheck }) {
               color,
             },
           }}
-          disabled={isChecked}
-          // checked={true}
-          onChange={onCheck}
-          name="variant"
+          disabled={isDisabled}
+          checked={isChecked}
+          onChange={(e) => onCheck(e.target.checked)}
         />
       }
     />

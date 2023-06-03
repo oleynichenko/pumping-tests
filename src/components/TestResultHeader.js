@@ -1,7 +1,12 @@
 import React from 'react';
 import { Stack, Typography } from '@mui/material';
 
-function TestResultHeader({ title }) {
+const getLevel = () => {
+
+};
+
+function TestResultHeader({ title, result }) {
+  const {percentScored, pointsScored, possibleScore, rightAnswersQuantity} = result;
   const today = new Date().toLocaleDateString('ru-RU');
 
   return (
@@ -23,11 +28,11 @@ function TestResultHeader({ title }) {
           Уровень эксперта
         </Typography>
         <Typography component="p" variant="h1">
-          56.4%
+          {`${percentScored}%`}
         </Typography>
         <Typography component="p" variant="h5" sx={{ maxWidth: 700 }}>
-          Вы правильно ответили на 11 вопросов из 12 и набрали 1.33 балла из
-          11.6 возможных
+          {`Вы правильно ответили на ${rightAnswersQuantity} из 12 вопросов и набрали ${pointsScored} балла из
+          ${possibleScore} возможных`}
         </Typography>
       </Stack>
     </>
