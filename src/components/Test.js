@@ -12,10 +12,10 @@ function Test() {
   const [testResults, setTestResults] = useState();
   const [status, setStatus] = useState(RequestStatus.Undone);
   const { user, testsCol, questionsCol } = useRealm();
-  // console.log('testResults', testResults);
+
   const checkTest = (results) => {
     user.functions.getTestResult(results).then((data) => {
-      setTestResults(data)
+      setTestResults(data);
       console.log(data);
     });
   };
@@ -40,21 +40,25 @@ function Test() {
             description: 1,
             links: 1,
             questions: 1,
+            'levels.conclusionPhrase': 1,
+            'levels.score': 1,
           },
         },
       ];
 
       const testRequest = testsCol.aggregate(testPipeline);
 
-      testRequest.then((testData) => {
-        if (!testData || testData.length === 0) {
+      testRequest.then((data) => {
+        if (!data || data.length === 0) {
           return;
         }
+
+        const testData = JSON.parse(JSON.stringify(data[0]));
 
         const {
           questions: { themes },
           links: { questionsQuantity },
-        } = testData[0];
+        } = testData;
 
         return questionsCol
           .aggregate([
@@ -69,7 +73,7 @@ function Test() {
             },
           ])
           .then((questionsData) => {
-            setTest({ ...testData[0], questionsData });
+            setTest({ ...testData, questionsData });
             setStatus(RequestStatus.Done);
           });
       });
@@ -88,15 +92,14 @@ function Test() {
         ) : (
           <TestResultHeader
             title={test.title}
+            levels={test.levels}
             result={testResults}
           />
         )}
       </Box>
       <Questions
         questions={test.questionsData}
-        wrongAnsweredQuestionIds={
-          testResults && testResults.wrongQuestionsIds
-        }
+        wrongAnsweredQuestionIds={testResults && testResults.wrongQuestionsIds}
         onSubmit={checkTest}
         onReset={() => setTestResults(undefined)}
       />

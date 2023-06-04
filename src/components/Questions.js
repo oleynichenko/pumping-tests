@@ -17,7 +17,7 @@ function Questions({
     {},
     questions.map((q) => q.id)
   );
-  console.log('values', values);
+
   const isTestChecked = !!wrongAnsweredQuestionIds;
 
   const reset = () => {
@@ -30,7 +30,7 @@ function Questions({
       return 'inherit';
     }
 
-    return wrongAnsweredQuestionIds.includes(id) ? error.light : success.light;
+    return wrongAnsweredQuestionIds.includes(id) ? error.light : 'inherit';
   };
 
   return (
@@ -64,7 +64,7 @@ function Questions({
               >
                 {Object.entries(question.options).map(([letter, text]) => {
                   const isOptionChecked = !!optionsChecked && optionsChecked.includes(letter);
-                  console.log(question.id, letter, isOptionChecked);
+
                   return (
                     <Option
                       key={letter}

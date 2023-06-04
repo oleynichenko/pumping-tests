@@ -1,13 +1,15 @@
 import React from 'react';
 import { Stack, Typography } from '@mui/material';
 
-const getLevel = () => {
-
+const getLevel = (levels, percentScored) => {
+  return levels.some(level => level.min >= percentScored && percentScored < level.max);
 };
 
-function TestResultHeader({ title, result }) {
-  const {percentScored, pointsScored, possibleScore, rightAnswersQuantity} = result;
+function TestResultHeader({ title, result, levels }) {
+  const { percentScored, pointsScored, possibleScore, rightAnswersQuantity } =
+    result;
   const today = new Date().toLocaleDateString('ru-RU');
+  const { conclusionPhrase } = getLevel(levels, pointsScored);
 
   return (
     <>
@@ -18,16 +20,18 @@ function TestResultHeader({ title, result }) {
       <Stack
         alignItems="center"
         sx={{ textAlign: 'center' }}
-        color="warning.light"
+        color={ percentScored >= 95 ? 'warning.light' : 'inherit'}
       >
-        <Typography
-          component="p"
-          variant="h5"
-          sx={{ textTransform: 'uppercase' }}
-        >
-          Уровень эксперта
-        </Typography>
-        <Typography component="p" variant="h1">
+        {conclusionPhrase && (
+          <Typography
+            component="p"
+            variant="h5"
+            sx={{ textTransform: 'uppercase' }}
+          >
+            {conclusionPhrase}
+          </Typography>
+        )}
+        <Typography component="p" variant="h1" fontWeight='400'>
           {`${percentScored}%`}
         </Typography>
         <Typography component="p" variant="h5" sx={{ maxWidth: 700 }}>
