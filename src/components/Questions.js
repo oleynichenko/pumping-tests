@@ -17,7 +17,7 @@ function Questions({
     {},
     questions.map((q) => q.id)
   );
-  console.log('values', values);
+
   const isTestChecked = !!wrongAnsweredQuestionIds;
 
   const reset = () => {
