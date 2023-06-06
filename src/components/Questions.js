@@ -11,8 +11,9 @@ function Questions({
   onReset,
 }) {
   const {
-    palette: { success, error },
+    palette: { error, grey },
   } = useTheme();
+
   const { valid, values, handleCheck, resetTest } = useTest(
     {},
     questions.map((q) => q.id)
@@ -30,7 +31,9 @@ function Questions({
       return 'inherit';
     }
 
-    return wrongAnsweredQuestionIds.includes(id) ? error.light : 'inherit';
+    return wrongAnsweredQuestionIds.includes(id)
+      ? error.light
+      : grey[700];
   };
 
   return (
@@ -63,7 +66,8 @@ function Questions({
                 }}
               >
                 {Object.entries(question.options).map(([letter, text]) => {
-                  const isOptionChecked = !!optionsChecked && optionsChecked.includes(letter);
+                  const isOptionChecked =
+                    !!optionsChecked && optionsChecked.includes(letter);
 
                   return (
                     <Option
@@ -84,7 +88,11 @@ function Questions({
         })}
       </List>
       {!isTestChecked ? (
-        <Button variant="contained" onClick={() => onSubmit(values)} disabled={!valid}>
+        <Button
+          variant="contained"
+          onClick={() => onSubmit(values)}
+          disabled={!valid}
+        >
           Оправить на проверку
         </Button>
       ) : (

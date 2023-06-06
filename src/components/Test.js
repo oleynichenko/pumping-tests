@@ -14,9 +14,11 @@ function Test() {
   const { user, testsCol, questionsCol } = useRealm();
 
   const checkTest = (results) => {
+    setStatus(RequestStatus.Waiting);
+
     user.functions.getTestResult(results).then((data) => {
       setTestResults(data);
-      console.log(data);
+      setStatus(RequestStatus.Waiting);
     });
   };
 
@@ -85,13 +87,14 @@ function Test() {
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 10 }}>
+    <Container maxWidth="md" sx={{ py: {xs: 4, md: 10} }}>
       <Box component="header" sx={{ mb: 5 }}>
         {!testResults ? (
           <TestHeader title={test.title} />
         ) : (
           <TestResultHeader
             title={test.title}
+            total={test.questionsData.length}
             levels={test.levels}
             result={testResults}
           />

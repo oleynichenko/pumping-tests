@@ -1,41 +1,41 @@
 import React from 'react';
 import { Stack, Typography } from '@mui/material';
+import getLevel from '../utils/getLevel';
+import { getNumEnding, QUESTION, SCORE } from '../utils/getNumEnding';
 
-const getLevel = (levels, percentScored) => {
-  return levels.some(level => level.min >= percentScored && percentScored < level.max);
-};
-
-function TestResultHeader({ title, result, levels }) {
+function TestResultHeader({ title, result, levels, total }) {
   const { percentScored, pointsScored, possibleScore, rightAnswersQuantity } =
     result;
   const today = new Date().toLocaleDateString('ru-RU');
-  const { conclusionPhrase } = getLevel(levels, pointsScored);
+  const level = getLevel(levels, percentScored);
+  const questionsWording = getNumEnding(total, QUESTION);
+  const scoreWording = getNumEnding(pointsScored, SCORE);
 
   return (
     <>
       <Typography variant="overline">{`Результаты теста от ${today}`}</Typography>
-      <Typography component="h1" variant="h4" sx={{ mb: 4 }}>
+      <Typography component="h1" variant="h4" sx={{ mb: 3 }}>
         {title}
       </Typography>
       <Stack
         alignItems="center"
         sx={{ textAlign: 'center' }}
-        color={ percentScored >= 95 ? 'warning.light' : 'inherit'}
+        color={percentScored >= 95 ? 'warning.light' : 'inherit'}
       >
-        {conclusionPhrase && (
+        {level && level.conclusionPhrase && (
           <Typography
             component="p"
             variant="h5"
             sx={{ textTransform: 'uppercase' }}
           >
-            {conclusionPhrase}
+            {level.conclusionPhrase}
           </Typography>
         )}
-        <Typography component="p" variant="h1" fontWeight='400'>
+        <Typography component="p" variant="h1" fontWeight="400">
           {`${percentScored}%`}
         </Typography>
         <Typography component="p" variant="h5" sx={{ maxWidth: 700 }}>
-          {`Вы правильно ответили на ${rightAnswersQuantity} из 12 вопросов и набрали ${pointsScored} балла из
+          {`Вы правильно ответили на ${rightAnswersQuantity} из ${total} ${questionsWording} и набрали ${pointsScored} ${scoreWording} из
           ${possibleScore} возможных`}
         </Typography>
       </Stack>
