@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, FormGroup, List, ListItem, ListItemText } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { useTheme } from '@mui/material/styles';
 import Option from './Option';
 import useTest from '../hooks/useTest';
@@ -10,6 +11,8 @@ function Questions({
   onSubmit,
   onReset,
 }) {
+  const [checking, setChecking] = useState(false);
+
   const {
     palette: { error, grey },
   } = useTheme();
@@ -20,20 +23,24 @@ function Questions({
   );
 
   const isTestChecked = !!wrongAnsweredQuestionIds;
+  const isTestDisabled = isTestChecked || checking;
 
   const reset = () => {
     resetTest();
     onReset();
   };
 
+  const handleSubmit = () => {
+    setChecking(true);
+    onSubmit(values).then(() => setChecking(false));
+  };
+
   const getQuestionColor = (id) => {
     if (!wrongAnsweredQuestionIds) {
-      return 'inherit';
+      return grey[700];
     }
 
-    return wrongAnsweredQuestionIds.includes(id)
-      ? error.light
-      : grey[700];
+    return wrongAnsweredQuestionIds.includes(id) ? error.light : grey[700];
   };
 
   return (
@@ -74,7 +81,7 @@ function Questions({
                       key={letter}
                       text={text}
                       isChecked={!!isOptionChecked}
-                      isDisabled={isTestChecked}
+                      isDisabled={isTestDisabled}
                       color={questionColor}
                       onCheck={(checked) =>
                         handleCheck(question.id, letter, checked)
@@ -87,18 +94,19 @@ function Questions({
           );
         })}
       </List>
-      {!isTestChecked ? (
-        <Button
-          variant="contained"
-          onClick={() => onSubmit(values)}
-          disabled={!valid}
-        >
-          Оправить на проверку
-        </Button>
-      ) : (
+      {isTestChecked && !checking ? (
         <Button variant="contained" onClick={reset}>
           Пересдать
         </Button>
+      ) : (
+        <LoadingButton
+          variant="contained"
+          onClick={handleSubmit}
+          disabled={!valid}
+          loading={checking}
+        >
+          Оправить на проверку
+        </LoadingButton>
       )}
     </>
   );

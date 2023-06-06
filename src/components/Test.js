@@ -1,93 +1,111 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Container } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import useRealm from '../hooks/useRealm';
 import Questions from './Questions';
 import getTestName from '../utils/getTestName';
 import { RequestStatus } from '../utils/request-status';
 import TestHeader from './TestHeader';
 import TestResultHeader from './TestResultHeader';
+import { LoadingScreen } from './LoadingScreen';
 
 function Test() {
   const [test, setTest] = useState();
   const [testResults, setTestResults] = useState();
   const [status, setStatus] = useState(RequestStatus.Undone);
+  const [error, setError] = useState('');
   const { user, testsCol, questionsCol } = useRealm();
 
   const checkTest = (results) => {
-    setStatus(RequestStatus.Waiting);
-
-    user.functions.getTestResult(results).then((data) => {
+    return user.functions.getTestResult(results).then((data) => {
       setTestResults(data);
-      setStatus(RequestStatus.Waiting);
     });
   };
 
   useEffect(() => {
-    if (testsCol && status === RequestStatus.Undone) {
-      const testName = getTestName();
+    if (!!test) {
+      return;
+    }
 
-      if (!testName) {
+    if (!testsCol || !questionsCol) {
+      setStatus(RequestStatus.Waiting);
+      return;
+    }
+
+    const testName = getTestName();
+
+    if (!testName) {
+      setError('Для загрузки теста введите правильный URL');
+      setStatus(RequestStatus.Done);
+
+      return;
+    }
+
+    const testPipeline = [
+      { $match: { 'links.permalink': testName } },
+      { $unwind: `$links` },
+      { $match: { 'links.permalink': testName } },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          links: 1,
+          questions: 1,
+          'levels.conclusionPhrase': 1,
+          'levels.score': 1,
+        },
+      },
+    ];
+
+    const testRequest = testsCol.aggregate(testPipeline);
+
+    testRequest.then((data) => {
+      if (!data || data.length === 0) {
+        setError('Теста с таким URL не существует');
         setStatus(RequestStatus.Done);
+
+        return;
       }
 
-      setStatus(RequestStatus.Waiting);
+      const testData = JSON.parse(JSON.stringify(data[0]));
 
-      const testPipeline = [
-        { $match: { 'links.permalink': testName } },
-        { $unwind: `$links` },
-        { $match: { 'links.permalink': testName } },
-        {
-          $project: {
-            title: 1,
-            description: 1,
-            links: 1,
-            questions: 1,
-            'levels.conclusionPhrase': 1,
-            'levels.score': 1,
+      const {
+        questions: { themes },
+        links: { questionsQuantity },
+      } = testData;
+
+      return questionsCol
+        .aggregate([
+          {
+            $match: { themes: { $in: themes } },
           },
-        },
-      ];
+          {
+            $sample: { size: questionsQuantity },
+          },
+          {
+            $sort: { id: 1 },
+          },
+        ])
+        .then((questionsData) => {
+          setTest({ ...testData, questionsData });
+          setStatus(RequestStatus.Done);
+        });
+    });
+  }, [testsCol, test, questionsCol]);
 
-      const testRequest = testsCol.aggregate(testPipeline);
+  if (error) {
+    return (
+      <Typography component="h4" sx={{ mt: 4, textAlign: 'center' }}>
+        {error}
+      </Typography>
+    );
+  }
 
-      testRequest.then((data) => {
-        if (!data || data.length === 0) {
-          return;
-        }
-
-        const testData = JSON.parse(JSON.stringify(data[0]));
-
-        const {
-          questions: { themes },
-          links: { questionsQuantity },
-        } = testData;
-
-        return questionsCol
-          .aggregate([
-            {
-              $match: { themes: { $in: themes } },
-            },
-            {
-              $sample: { size: questionsQuantity },
-            },
-            {
-              $sort: { id: 1 },
-            },
-          ])
-          .then((questionsData) => {
-            setTest({ ...testData, questionsData });
-            setStatus(RequestStatus.Done);
-          });
-      });
-    }
-  }, [testsCol]);
-
-  if (!test) {
-    return null;
+  if (status !== RequestStatus.Done) {
+    return <LoadingScreen />;
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: {xs: 4, md: 10} }}>
+    <Container maxWidth="md" sx={{ py: { xs: 4, md: 10 } }}>
       <Box component="header" sx={{ mb: 5 }}>
         {!testResults ? (
           <TestHeader title={test.title} />
@@ -104,7 +122,11 @@ function Test() {
         questions={test.questionsData}
         wrongAnsweredQuestionIds={testResults && testResults.wrongQuestionsIds}
         onSubmit={checkTest}
-        onReset={() => setTestResults(undefined)}
+        onReset={() => {
+          setTestResults(undefined);
+          setTest(undefined);
+          setStatus(RequestStatus.Undone);
+        }}
       />
     </Container>
   );
