@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Box, Container, Typography } from '@mui/material';
 import useRealm from '../hooks/useRealm';
 import Questions from './Questions';
-import getTestName from '../utils/getTestName';
 import { RequestStatus } from '../utils/request-status';
 import TestHeader from './TestHeader';
 import TestResultHeader from './TestResultHeader';
@@ -14,6 +14,7 @@ function Test() {
   const [status, setStatus] = useState(RequestStatus.Undone);
   const [error, setError] = useState('');
   const { user, testsCol, questionsCol } = useRealm();
+  const { testName } = useParams();
 
   const checkTest = (results) => {
     return user.functions.getTestResult(results).then((data) => {
@@ -30,8 +31,6 @@ function Test() {
       setStatus(RequestStatus.Waiting);
       return;
     }
-
-    const testName = getTestName();
 
     if (!testName) {
       setError('Для загрузки теста введите правильный URL');
