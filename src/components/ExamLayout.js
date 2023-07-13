@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import Login from './Login';
 import storeService from '../services/StorageService';
 
@@ -10,12 +11,16 @@ function ExamLayout() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const userData = storeService.getItem();
+    const userData = storeService.getItem('user');
+    // get userFromServer by email
+    const user = userData ? { ...userData } : null;
 
-    if (userData) {
-      setUser(userData);
+    if (user) {
+      // set in store in case it was changed on another device
+      storeService.setItem('user', user);
+      setUser(user);
     }
-  }, [])
+  }, []);
 
   const handleLoginOpen = () => {
     setLoginOpen(true);
@@ -26,8 +31,9 @@ function ExamLayout() {
   };
 
   const handleLoginSubmit = (data) => {
-    setUser(data);
-    storeService.setItem('user', data);
+    //remove set score
+    setUser({ ...data, score: '34%' });
+    storeService.setItem('user', { ...data, score: '34%' });
     setLoginOpen(false);
   };
 
@@ -38,12 +44,24 @@ function ExamLayout() {
 
   return (
     <>
-      <Toolbar>
+      <Toolbar sx={{ justifyContent: 'flex-end' }}>
         <Button sx={{ ml: 'auto', mr: 1 }}>Главная</Button>
-        {!user
-          ? <Button onClick={handleLoginOpen}>Сдать тест</Button>
-          : <Button onClick={handleLoginOut}>Выйти</Button>
-        }
+        {!user ? (
+          <Button onClick={handleLoginOpen}>Сдать экзамен</Button>
+        ) : (
+          <Button onClick={handleLoginOut}>Выйти</Button>
+        )}
+      </Toolbar>
+      <Toolbar>
+        {user && user.score && (
+          <Typography
+            variant="h5"
+            color={'warning.light'}
+            sx={{ ml: 'auto' }}
+          >
+            {`${user.name} ${user.surname}, ваш макс. результат ${user.score}`}
+          </Typography>
+        )}
       </Toolbar>
       {loginOpen && (
         <Login onClose={handleLoginClose} onSubmit={handleLoginSubmit} />
