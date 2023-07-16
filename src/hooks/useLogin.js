@@ -34,7 +34,7 @@ const useLogin = () => {
     setLoginDataValid(
       ['name', 'surname', 'email'].every((key) => !errors[key] && !!loginData[key])
     );
-    console.log(errors)
+
     setLoginErrors(errors);
   };
 

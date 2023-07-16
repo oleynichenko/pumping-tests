@@ -1,21 +1,32 @@
-import * as Realm from 'realm-web';
-
 class RealmService {
-  constructor() {
-    this.app = new Realm.App({ id: process.env.REACT_APP_REALM_APP_ID });
+  async getExam(collection, name) {
+    const pipeline = [
+      {$match: {'links.permalink': name}},
+      {$unwind: `$links`},
+      {$match: {'links.permalink': name}},
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          links: 1,
+          'levels.conclusionPhrase': 1,
+          'levels.score': 1,
+        },
+      },
+    ];
+
+    return collection.aggregate(pipeline).then((data) => {
+      if (!data || data.length === 0) {
+        throw new Error('Теста с таким URL не существует');
+      }
+
+      return JSON.parse(JSON.stringify(data[0]));
+    });
   }
-
-  async init() {
-    const credentials = Realm.Credentials.anonymous();
-
-    await this.app.logIn(credentials);
-
-    this.client = this.app.currentUser.mongoClient('mongodb-atlas');
-  } 
   
   async getTest() {
-    this.client.db('sample_restaurants').collection('restaurants')
+
   }
 }
 
-export default RealmService();
+export default new RealmService();

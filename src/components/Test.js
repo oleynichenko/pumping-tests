@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Container, Typography } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import useRealm from '../hooks/useRealm';
 import Questions from './Questions';
 import { RequestStatus } from '../utils/request-status';
 import TestHeader from './TestHeader';
 import TestResultHeader from './TestResultHeader';
 import { LoadingScreen } from './LoadingScreen';
+import Error from './Error';
 
 function Test() {
   const [test, setTest] = useState();
@@ -92,11 +93,7 @@ function Test() {
   }, [testsCol, test, questionsCol]);
 
   if (error) {
-    return (
-      <Typography component="h4" sx={{ mt: 4, textAlign: 'center' }}>
-        {error}
-      </Typography>
-    );
+    return <Error error={error} />;
   }
 
   if (status !== RequestStatus.Done) {
