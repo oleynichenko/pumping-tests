@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import Login from './Login';
 
 function Menu({ onLogOut, onLoginSubmit, isAuthenticated }) {
+  const { testName } = useParams();
   const navigate = useNavigate();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
@@ -26,10 +27,16 @@ function Menu({ onLogOut, onLoginSubmit, isAuthenticated }) {
       <Toolbar sx={{ justifyContent: 'flex-end' }}>
         {isAuthenticated && (
           <>
-            <Button sx={{ ml: 'auto', mr: 1 }} onClick={() => navigate('/')}>
+            <Button
+              sx={{ ml: 'auto', mr: 1 }}
+              onClick={() => navigate(`/exam/${testName}`)}
+            >
               Главная
             </Button>
-            <Button sx={{ mr: 1 }} onClick={() => navigate('/')}>
+            <Button
+              sx={{ mr: 1 }}
+              onClick={() => navigate(`/exam/${testName}/test`)}
+            >
               Тест
             </Button>
             <Button onClick={onLogOut}>Выйти</Button>

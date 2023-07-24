@@ -25,6 +25,7 @@ const RealmProvider = ({ children }) => {
         user,
         testsCol: database && database.collection('tests'),
         questionsCol: database && database.collection('questions'),
+        passesCol: database && database.collection('passes'),
       }}
     >
       {children}

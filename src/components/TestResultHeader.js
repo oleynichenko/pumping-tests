@@ -20,7 +20,7 @@ function TestResultHeader({ title, result, levels, total }) {
       <Stack
         alignItems="center"
         sx={{ textAlign: 'center' }}
-        color={percentScored >= 95 ? 'warning.light' : 'inherit'}
+        color={level.name === 'expert' ? 'warning.light' : 'inherit'}
       >
         {level && level.conclusionPhrase && (
           <Typography
@@ -39,6 +39,11 @@ function TestResultHeader({ title, result, levels, total }) {
           ${possibleScore} возможных`}
         </Typography>
       </Stack>
+      {level && level.feedback && (
+        <Typography component="p" sx={{ mt: 2, textAlign: 'justify' }}>
+          {level.feedback}
+        </Typography>
+      )}
     </>
   );
 }
