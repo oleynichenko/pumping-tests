@@ -1,7 +1,8 @@
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import Test from './components/Test';
+import router from './router';
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import { RealmProvider } from './contexts/RealmContext';
+import { RouterProvider } from "react-router-dom";
 
 let theme = createTheme();
 theme = responsiveFontSizes(theme);
@@ -11,7 +12,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <RealmProvider>
         <CssBaseline />
-        <Test />
+        <RouterProvider router={router} />
       </RealmProvider>
     </ThemeProvider>
   );

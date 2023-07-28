@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Container, Typography } from '@mui/material';
+import { useParams } from 'react-router-dom';
+import { Box, Container } from '@mui/material';
 import useRealm from '../hooks/useRealm';
 import Questions from './Questions';
-import getTestName from '../utils/getTestName';
 import { RequestStatus } from '../utils/request-status';
 import TestHeader from './TestHeader';
 import TestResultHeader from './TestResultHeader';
 import { LoadingScreen } from './LoadingScreen';
+import Error from './Error';
 
-function Test() {
+function Test({ onCheckTest }) {
   const [test, setTest] = useState();
   const [testResults, setTestResults] = useState();
   const [status, setStatus] = useState(RequestStatus.Undone);
   const [error, setError] = useState('');
   const { user, testsCol, questionsCol } = useRealm();
+  const { testName } = useParams();
 
   const checkTest = (results) => {
     return user.functions.getTestResult(results).then((data) => {
       setTestResults(data);
+
+      if (onCheckTest) {
+        onCheckTest(data.percentScored, test.exam);
+      }
     });
   };
 
@@ -30,8 +36,6 @@ function Test() {
       setStatus(RequestStatus.Waiting);
       return;
     }
-
-    const testName = getTestName();
 
     if (!testName) {
       setError('Для загрузки теста введите правильный URL');
@@ -49,7 +53,10 @@ function Test() {
           title: 1,
           description: 1,
           links: 1,
+          exam: 1,
           questions: 1,
+          'levels.name': 1,
+          'levels.feedback': 1,
           'levels.conclusionPhrase': 1,
           'levels.score': 1,
         },
@@ -90,14 +97,11 @@ function Test() {
           setStatus(RequestStatus.Done);
         });
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [testsCol, test, questionsCol]);
 
   if (error) {
-    return (
-      <Typography component="h4" sx={{ mt: 4, textAlign: 'center' }}>
-        {error}
-      </Typography>
-    );
+    return <Error error={error} />;
   }
 
   if (status !== RequestStatus.Done) {
