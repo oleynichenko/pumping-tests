@@ -11,38 +11,38 @@ function ExamTest() {
   const { passesCol } = useRealm();
   const { testName } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [pass, setPass] = useState(null);
 
   useEffect(() => {
-    const user = storeService.getItem('user');
+    const pass = storeService.getItem(testName);
 
-    if (!user) {
+    if (!pass) {
       navigate(`/exam/${testName}`);
     } else {
-      setUser(user);
+      setPass(pass);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveTestResult = (score, examMinScore) => {
-    realmService.savePass(passesCol, user, score, examMinScore).then((data) => {
-      storeService.setItem('user', data);
-      setUser(data);
+    realmService.savePass(passesCol, pass, score, examMinScore).then((data) => {
+      storeService.setItem(testName, data);
+      setPass(data);
     });
   };
 
   return (
     <>
       <Toolbar>
-        {user && user.score && (
+        {pass && pass.score && (
           <Typography variant="subtitle" color={'warning.light'} sx={{ ml: 'auto', textAlign: 'right' }}>
-            {`${user.name} ${user.surname}, ваш максимальный результат ${Math.max(
-              ...user.score
+            {`${pass.name} ${pass.surname}, ваш максимальный результат ${Math.max(
+              ...pass.score
             )}%`}
           </Typography>
         )}
       </Toolbar>
-      <Test onCheckTest={(score, examMinScore) => saveTestResult(score, examMinScore)} />
+      <Test onCheckTest={(score, examMinScore) => saveTestResult(score, examMinScore)} isExam={true}/>
     </>
   );
 }

@@ -22,7 +22,7 @@ const RealmProvider = ({ children }) => {
   return (
     <RealmContext.Provider
       value={{
-        user,
+        realmFunctions: user && user.functions,
         testsCol: database && database.collection('tests'),
         questionsCol: database && database.collection('questions'),
         passesCol: database && database.collection('passes'),

@@ -50,12 +50,19 @@ function ExamResults({ testName }) {
     return <LoadingScreen />;
   }
 
-  const formatDate = (date) => {
-    return date.toLocaleDateString('ru-RU', {
+  const formatDate = (date, time) => {
+    const options = {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    });
+    };
+
+    if (time) {
+      options.hour = "numeric";
+      options.minute = "numeric";
+    }
+
+    return date.toLocaleDateString('ru-RU', options);
   };
 
   if (results && !results.length) {
@@ -84,7 +91,7 @@ function ExamResults({ testName }) {
                 {`${result.name} ${result.surname}`}
               </TableCell>
               <TableCell>{`${Math.max(...result.score)}%`}</TableCell>
-              <TableCell>{formatDate(result.updated)}</TableCell>
+              <TableCell>{formatDate(result.updated, true)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

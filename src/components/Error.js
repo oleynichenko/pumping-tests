@@ -1,11 +1,14 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
 
 function Error({ error }) {
   return (
-    <Typography variant="h4" sx={{ mt: 4, textAlign: 'center' }}>
-      {error}
-    </Typography>
+    <Container maxWidth="md" sx={{ mt: 10 }}>
+      <Typography variant="h4" sx={{ textAlign: 'center' }}>
+        {error}
+      </Typography>
+    </Container>
   );
 }
 

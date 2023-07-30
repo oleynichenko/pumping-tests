@@ -1,9 +1,11 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Stack } from '@mui/material';
 import storeService from '../services/StorageService';
 import Menu from './Menu';
 import realmService from '../services/RealmService';
 import useRealm from '../hooks/useRealm';
+import Footer from './Footer';
 
 function ExamLayout() {
   const navigate = useNavigate();
@@ -12,29 +14,31 @@ function ExamLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useLayoutEffect(() => {
-    const userData = storeService.getItem('user');
+    const passData = storeService.getItem(testName);
 
-    if (userData && passesCol) {
+    if (passData && passesCol) {
       realmService
-        .getPass(passesCol, userData.email, testName)
+        .getPass(passesCol, passData.email, testName)
         .then((data) => {
-          storeService.setItem('user', data);
+          // in case there were passes on other browsers
+          const updatedPass = { ...passData, ...data };
+
+          storeService.setItem(testName, updatedPass);
           setIsAuthenticated(true);
-          // navigate(`/exam/${testName}`);
         })
         .catch((err) => console.log(err));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passesCol]);
 
-  const handleLoginSubmit = (user) => {
-    const { name, surname, email } = user;
+  const handleLoginSubmit = (pass) => {
+    const { name, surname, email } = pass;
 
     realmService
       .getPass(passesCol, email, testName)
       .then((data) => {
-        const userData = data
-          // we let a user to update a name and surname
+        // we let a user to update a name and surname
+        const passData = data
           ? { ...data, name, surname }
           : {
               name,
@@ -43,7 +47,7 @@ function ExamLayout() {
               permalink: testName,
             };
 
-        storeService.setItem('user', userData);
+        storeService.setItem(testName, passData);
         setIsAuthenticated(true);
 
         navigate(`/exam/${testName}/test`);
@@ -52,13 +56,13 @@ function ExamLayout() {
   };
 
   const handleLoginOut = () => {
-    storeService.removeItem('user');
+    storeService.removeItem(testName);
     setIsAuthenticated(false);
     navigate(`/exam/${testName}`);
   };
 
   return (
-    <>
+    <Stack sx={{ minHeight: '100vh' }}>
       {!!testName && (
         <Menu
           onLogOut={handleLoginOut}
@@ -67,7 +71,8 @@ function ExamLayout() {
         />
       )}
       <Outlet />
-    </>
+      <Footer sx={{ mt: 'auto' }} />
+    </Stack>
   );
 }
 
