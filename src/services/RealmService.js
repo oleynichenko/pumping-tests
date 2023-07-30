@@ -42,8 +42,58 @@ class RealmService {
     return collection.findOne(filter);
   }
 
-  async savePass(collection, userData, newScore, examMinScore) {
-    const { email, name, surname, permalink, score = [] } = userData;
+  async getTest(testsCollection, questionsCollection, permalink, isExam) {
+    const testPipeline = [
+      { $match: { 'links.permalink': permalink, exam: { $exists: isExam } } },
+      { $unwind: `$links` },
+      { $match: { 'links.permalink': permalink } },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          links: 1,
+          exam: 1,
+          questions: 1,
+          'levels.name': 1,
+          'levels.feedback': 1,
+          'levels.conclusionPhrase': 1,
+          'levels.score': 1,
+        },
+      },
+    ];
+
+    return testsCollection.aggregate(testPipeline).then((data) => {
+      if (!data || data.length === 0) {
+        throw new Error('Теста с таким URL не существует');
+      }
+
+      const testData = JSON.parse(JSON.stringify(data[0]));
+
+      const {
+        questions: { themes },
+        links: { questionsQuantity },
+      } = testData;
+
+      return questionsCollection
+        .aggregate([
+          {
+            $match: { themes: { $in: themes } },
+          },
+          {
+            $sample: { size: questionsQuantity },
+          },
+          {
+            $sort: { id: 1 },
+          },
+        ])
+        .then((questionsData) => {
+          return { ...testData, questionsData };
+        });
+    });
+  }
+
+  async savePass(collection, passData, newScore, examMinScore) {
+    const { email, name, surname, permalink, score = [] } = passData;
 
     const filter = {
       email,
@@ -70,4 +120,5 @@ class RealmService {
 }
 
 const realmService = new RealmService();
+
 export default realmService;
