@@ -14,7 +14,7 @@ function ExamLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useLayoutEffect(() => {
-    const passData = storeService.getItem(testName);
+    const passData = storeService.getPass(testName);
 
     if (passData && passesCol) {
       realmService
@@ -23,7 +23,7 @@ function ExamLayout() {
           // in case there were passes on other browsers
           const updatedPass = { ...passData, ...data };
 
-          storeService.setItem(testName, updatedPass);
+          storeService.setPass(testName, updatedPass);
           setIsAuthenticated(true);
         })
         .catch((err) => console.log(err));
@@ -47,7 +47,7 @@ function ExamLayout() {
               permalink: testName,
             };
 
-        storeService.setItem(testName, passData);
+        storeService.setPass(testName, passData);
         setIsAuthenticated(true);
 
         navigate(`/exam/${testName}/test`);
@@ -64,11 +64,7 @@ function ExamLayout() {
   return (
     <Stack sx={{ minHeight: '100vh' }}>
       {!!testName && (
-        <Menu
-          onLogOut={handleLoginOut}
-          onLoginSubmit={handleLoginSubmit}
-          isAuthenticated={isAuthenticated}
-        />
+        <Menu onLogOut={handleLoginOut} onLoginSubmit={handleLoginSubmit} isAuthenticated={isAuthenticated} />
       )}
       <Outlet />
       <Footer sx={{ mt: 'auto' }} />

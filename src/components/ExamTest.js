@@ -14,7 +14,7 @@ function ExamTest() {
   const [pass, setPass] = useState(null);
 
   useEffect(() => {
-    const pass = storeService.getItem(testName);
+    const pass = storeService.getPass(testName);
 
     if (!pass) {
       navigate(`/exam/${testName}`);
@@ -26,7 +26,7 @@ function ExamTest() {
 
   const saveTestResult = (score, examMinScore) => {
     realmService.savePass(passesCol, pass, score, examMinScore).then((data) => {
-      storeService.setItem(testName, data);
+      storeService.setPass(testName, data);
       setPass(data);
     });
   };

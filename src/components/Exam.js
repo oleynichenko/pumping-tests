@@ -56,23 +56,16 @@ function Exam() {
 
   return (
     <Container maxWidth="md" sx={{ py: { xs: 4, md: 10 } }}>
-      <Typography
-        variant="h4"
-        sx={{ mb: 2, textAlign: 'center', fontWeight: 500 }}
-      >
+      <Typography variant="h4" sx={{ mb: 2, textAlign: 'center', fontWeight: 500 }}>
         Экзаменационный тест курса
       </Typography>
-      <Typography
-        component="h1"
-        variant="h2"
-        sx={{ mb: 3, textAlign: 'center' }}
-      >
+      <Typography component="h1" variant="h2" sx={{ mb: 3, textAlign: 'center' }}>
         {test.title}
       </Typography>
       <Typography variant="subtitle1" sx={{ mb: 5, textAlign: 'center' }}>
         {test.description}
       </Typography>
-      <ExamResults testName={testName} />
+      <ExamResults testName={testName} minScore={test.exam} />
     </Container>
   );
 }

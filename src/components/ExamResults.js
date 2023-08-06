@@ -13,32 +13,24 @@ import { RequestStatus } from '../utils/request-status';
 import { DEFAULT_ERROR_MESSAGE } from '../Constants';
 import { LoadingScreen } from './LoadingScreen';
 
-function ExamResults({ testName }) {
+function ExamResults({ testName, minScore }) {
   const [results, setResults] = useState();
   const { passesCol } = useRealm();
   const [error, setError] = useState('');
   const [status, setStatus] = useState(RequestStatus.Undone);
 
   useEffect(() => {
-    if (error) {
-      return;
+    if (!error && !!passesCol) {
+      realmService
+        .getExamResults(passesCol, testName, minScore)
+        .then((data) => setResults(data))
+        .catch((err) => {
+          const message = err.message || DEFAULT_ERROR_MESSAGE;
+
+          setError(message);
+        })
+        .finally(() => setStatus(RequestStatus.Done));
     }
-
-    if (!passesCol) {
-      return;
-    }
-
-    setStatus(RequestStatus.Waiting);
-
-    realmService
-      .getExamResults(passesCol, testName)
-      .then((data) => setResults(data))
-      .catch((err) => {
-        const message = err.message || DEFAULT_ERROR_MESSAGE;
-
-        setError(message);
-      })
-      .finally(() => setStatus(RequestStatus.Done));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passesCol]);
 
@@ -58,8 +50,8 @@ function ExamResults({ testName }) {
     };
 
     if (time) {
-      options.hour = "numeric";
-      options.minute = "numeric";
+      options.hour = 'numeric';
+      options.minute = 'numeric';
     }
 
     return date.toLocaleDateString('ru-RU', options);
@@ -82,10 +74,7 @@ function ExamResults({ testName }) {
         </TableHead>
         <TableBody>
           {results.map((result) => (
-            <TableRow
-              key={result.name}
-              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-            >
+            <TableRow key={result.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
               <TableCell>{formatDate(result.passDate)}</TableCell>
               <TableCell component="th" scope="result">
                 {`${result.name} ${result.surname}`}

@@ -9,6 +9,7 @@ class RealmService {
           title: 1,
           description: 1,
           links: 1,
+          exam: 1,
           'levels.conclusionPhrase': 1,
           'levels.score': 1,
         },
@@ -24,9 +25,9 @@ class RealmService {
     });
   }
 
-  async getExamResults(collection, permalink) {
+  async getExamResults(collection, permalink, minScore) {
     const filter = {
-      updated: { $exists: true },
+      score: { $gte: minScore },
       permalink,
     };
 
@@ -92,7 +93,7 @@ class RealmService {
     });
   }
 
-  async savePass(collection, passData, newScore, examMinScore) {
+  async savePass(collection, passData, newScore) {
     const { email, name, surname, permalink, score = [] } = passData;
 
     const filter = {
@@ -109,13 +110,13 @@ class RealmService {
       updated: new Date(),
     };
 
-    if (newScore > examMinScore) {
+    if (newScore >= Math.max(score)) {
+      // passDate - date of the max score result
+
       update.passDate = new Date();
     }
 
-    return collection
-      .updateOne(filter, update, { upsert: true })
-      .then(() => update);
+    return collection.updateOne(filter, update, { upsert: true }).then(() => update);
   }
 }
 

@@ -8,20 +8,23 @@ import TestResultHeader from './TestResultHeader';
 import { LoadingScreen } from './LoadingScreen';
 import Error from './Error';
 import realmService from '../services/RealmService';
+import storeService from '../services/StorageService';
 
 function Test({ onCheckTest, isExam }) {
   const { realmFunctions, testsCol, questionsCol } = useRealm();
   const { testName } = useParams();
 
   const [test, setTest] = useState(null);
-  const [testResults, setTestResults] = useState();
+  const [testResults, setTestResults] = useState(null);
   const [error, setError] = useState('');
 
   const checkTest = (results) => {
     return realmFunctions.getTestResult(results).then((data) => {
       setTestResults(data);
+      storeService.setTestResults(testName, data);
 
       if (onCheckTest) {
+        // test.exam - shows the minimal score to be shown in exam results table
         onCheckTest(data.percentScored, test.exam);
       }
 
@@ -37,14 +40,28 @@ function Test({ onCheckTest, isExam }) {
 
   useEffect(() => {
     if (!test && !!testName && testsCol && questionsCol) {
-      realmService
-        .getTest(testsCol, questionsCol, testName, isExam)
-        .then((data) => setTest(data))
-        .catch((err) => {
-          const message =
-            err.message || 'Ошибка загрзуки. Попробуйте перегрузить страницу';
-          setError(message);
-        });
+      const savedTest = storeService.getTest(testName);
+
+      if (savedTest) {
+        setTest(savedTest);
+
+        const testResultsData = storeService.getTestResults(testName);
+
+        if (!!testResultsData) {
+          setTestResults(testResultsData);
+        }
+      } else {
+        realmService
+          .getTest(testsCol, questionsCol, testName, isExam)
+          .then((data) => {
+            storeService.setTest(testName, data);
+            setTest(data);
+          })
+          .catch((err) => {
+            const message = err.message || 'Ошибка загрзуки. Попробуйте перегрузить страницу';
+            setError(message);
+          });
+      }
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,11 +90,13 @@ function Test({ onCheckTest, isExam }) {
         )}
       </Box>
       <Questions
+        testName={testName}
         questions={test.questionsData}
         wrongAnsweredQuestionIds={testResults && testResults.wrongQuestionsIds}
         onSubmit={checkTest}
         onReset={() => {
-          setTestResults(undefined);
+          setTestResults(null);
+          storeService.setTestResults(testName, null);
           setTest(null);
         }}
       />

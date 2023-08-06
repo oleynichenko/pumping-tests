@@ -5,12 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import Option from './Option';
 import useTest from '../hooks/useTest';
 
-function Questions({
-  questions = [],
-  wrongAnsweredQuestionIds,
-  onSubmit,
-  onReset,
-}) {
+function Questions({ testName, questions = [], wrongAnsweredQuestionIds, onSubmit, onReset }) {
   const [checking, setChecking] = useState(false);
 
   const {
@@ -18,7 +13,7 @@ function Questions({
   } = useTheme();
 
   const { valid, values, handleCheck, resetTest } = useTest(
-    {},
+    testName,
     questions.map((q) => q.id)
   );
 
@@ -60,10 +55,7 @@ function Questions({
                 pb: 0.5,
               }}
             >
-              <ListItemText
-                primary={question.wording}
-                sx={{ ...(isTestChecked && { color: questionColor }) }}
-              />
+              <ListItemText primary={question.wording} sx={{ ...(isTestChecked && { color: questionColor }) }} />
               <FormGroup
                 sx={{
                   alignItems: 'flex-start',
@@ -73,8 +65,7 @@ function Questions({
                 }}
               >
                 {Object.entries(question.options).map(([letter, text]) => {
-                  const isOptionChecked =
-                    !!optionsChecked && optionsChecked.includes(letter);
+                  const isOptionChecked = !!optionsChecked && optionsChecked.includes(letter);
 
                   return (
                     <Option
@@ -83,9 +74,7 @@ function Questions({
                       isChecked={!!isOptionChecked}
                       isDisabled={isTestDisabled}
                       color={questionColor}
-                      onCheck={(checked) =>
-                        handleCheck(question.id, letter, checked)
-                      }
+                      onCheck={(checked) => handleCheck(question.id, letter, checked)}
                     />
                   );
                 })}
@@ -99,12 +88,7 @@ function Questions({
           Пересдать
         </Button>
       ) : (
-        <LoadingButton
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={!valid}
-          loading={checking}
-        >
+        <LoadingButton variant="contained" onClick={handleSubmit} disabled={!valid} loading={checking}>
           Оправить на проверку
         </LoadingButton>
       )}

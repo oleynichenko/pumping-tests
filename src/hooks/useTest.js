@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
+import storeService from '../services/StorageService';
 
-const useTest = (initialValues, questionIds) => {
-  const [values, setValues] = useState(initialValues);
+const useTest = (testName, questionIds) => {
+  const [values, setValues] = useState(storeService.getTestValues(testName) || {});
   const [valid, setValid] = useState(false);
 
   useEffect(() => {
-    const isTestNotAnswered = questionIds.some(id => !values[id] || !values[id].length);
+    const isTestNotAnswered = questionIds.some((id) => !values[id] || !values[id].length);
 
     setValid(!isTestNotAnswered);
   }, [values, questionIds]);
@@ -22,14 +23,18 @@ const useTest = (initialValues, questionIds) => {
       updatedLetters = prevLetters.filter((l) => l !== letter);
     }
 
-    setValues({
+    const valuesData = {
       ...values,
       [questionId]: updatedLetters,
-    });
+    };
+
+    storeService.setTestValues(testName, valuesData);
+    setValues(valuesData);
   };
 
   const resetTest = () => {
     setValues({});
+    storeService.setTestValues(testName, {});
   };
 
   return {
