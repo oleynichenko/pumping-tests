@@ -58,7 +58,7 @@ function Test({ onCheckTest, isExam }) {
             setTest(data);
           })
           .catch((err) => {
-            const message = err.message || 'Ошибка загрзуки. Попробуйте перегрузить страницу';
+            const message = err.message || 'Ошибка загрузки. Попробуйте перегрузить страницу';
             setError(message);
           });
       }
@@ -83,6 +83,7 @@ function Test({ onCheckTest, isExam }) {
         ) : (
           <TestResultHeader
             title={test.title}
+            examMinScore={test.exam}
             total={test.questionsData.length}
             levels={test.levels}
             result={testResults}
@@ -98,6 +99,7 @@ function Test({ onCheckTest, isExam }) {
           setTestResults(null);
           storeService.setTestResults(testName, null);
           setTest(null);
+          storeService.setTest(testName, null);
         }}
       />
     </Container>

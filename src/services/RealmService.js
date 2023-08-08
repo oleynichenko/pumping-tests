@@ -59,6 +59,7 @@ class RealmService {
           'levels.feedback': 1,
           'levels.conclusionPhrase': 1,
           'levels.score': 1,
+          'levels.color': 1,
         },
       },
     ];
@@ -93,8 +94,8 @@ class RealmService {
     });
   }
 
-  async savePass(collection, passData, newScore) {
-    const { email, name, surname, permalink, score = [] } = passData;
+  async savePass(collection, data, newScore) {
+    const { email, name, surname, permalink, score = [], passDate } = data;
 
     const filter = {
       email,
@@ -107,6 +108,7 @@ class RealmService {
       surname,
       email,
       permalink,
+      passDate: new Date(passDate),
       updated: new Date(),
     };
 

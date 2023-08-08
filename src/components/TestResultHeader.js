@@ -20,7 +20,7 @@ function TestResultHeader({ title, result, levels, total }) {
       <Stack
         alignItems="center"
         sx={{ textAlign: 'center' }}
-        color={level.name === 'expert' ? 'warning.light' : 'inherit'}
+        color={level.color || 'inherit'}
       >
         {level && level.conclusionPhrase && (
           <Typography
