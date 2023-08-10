@@ -41,7 +41,7 @@ function TestResultHeader({ title, result, levels, total }) {
       </Stack>
       {level && level.feedback && (
         <Typography component="p" sx={{ mt: 2, textAlign: 'justify' }}>
-          {level.feedback}
+          {level.feedback.data || level.feedback}
         </Typography>
       )}
     </>
