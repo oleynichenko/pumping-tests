@@ -76,18 +76,18 @@ class RealmService {
         links: { questionsQuantity },
       } = testData;
 
+      const sampleStage = questionsQuantity ? { $sample: { size: questionsQuantity } } : null;
+
       return questionsCollection
         .aggregate([
           {
             $match: { themes: { $in: themes } },
           },
-          {
-            $sample: { size: questionsQuantity },
-          },
+          sampleStage,
           {
             $sort: { id: 1 },
           },
-        ])
+        ].filter(Boolean))
         .then((questionsData) => {
           return { ...testData, questionsData };
         });
