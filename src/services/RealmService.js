@@ -48,6 +48,13 @@ class RealmService {
       { $match: { 'links.permalink': permalink, exam: { $exists: isExam } } },
       { $unwind: `$links` },
       { $match: { 'links.permalink': permalink } },
+      { $lookup: {
+          from: 'materials',
+          localField: 'materialId',
+          foreignField: "id",
+          as: "material"
+        }
+      },
       {
         $project: {
           title: 1,
@@ -60,6 +67,7 @@ class RealmService {
           'levels.conclusionPhrase': 1,
           'levels.score': 1,
           'levels.color': 1,
+          'material.content': 1
         },
       },
     ];

@@ -3,9 +3,8 @@ import { Stack, Typography } from '@mui/material';
 import getLevel from '../utils/getLevel';
 import { getNumEnding, QUESTION, SCORE } from '../utils/getNumEnding';
 
-function TestResultHeader({ title, result, levels, total }) {
-  const { percentScored, pointsScored, possibleScore, rightAnswersQuantity } =
-    result;
+function TestResultHeader({ result, levels, total }) {
+  const { percentScored, pointsScored, possibleScore, rightAnswersQuantity } = result;
   const today = new Date().toLocaleDateString('ru-RU');
   const level = getLevel(levels, percentScored);
   const questionsWording = getNumEnding(total, QUESTION);
@@ -13,21 +12,10 @@ function TestResultHeader({ title, result, levels, total }) {
 
   return (
     <>
-      <Typography variant="overline">{`Результаты теста от ${today}`}</Typography>
-      <Typography component="h1" variant="h4" sx={{ mb: 3 }}>
-        {title}
-      </Typography>
-      <Stack
-        alignItems="center"
-        sx={{ textAlign: 'center' }}
-        color={level.color || 'inherit'}
-      >
+      <Typography variant="overline" component="p" textAlign="center">{`Результаты от ${today}`}</Typography>
+      <Stack alignItems="center" sx={{ textAlign: 'center' }} color={level.color || 'inherit'}>
         {level && level.conclusionPhrase && (
-          <Typography
-            component="p"
-            variant="h5"
-            sx={{ textTransform: 'uppercase' }}
-          >
+          <Typography component="p" variant="h5" sx={{ textTransform: 'uppercase' }}>
             {level.conclusionPhrase}
           </Typography>
         )}
