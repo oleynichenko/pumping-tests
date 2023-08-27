@@ -90,7 +90,7 @@ function Test({ onCheckTest, isExam }) {
     return <LoadingScreen />;
   }
 
-  const material = test.material[0];
+  const material = test.material && test.material[0];
 
   return (
     <Container maxWidth="md" sx={{ py: { xs: 10, md: 12 } }}>
