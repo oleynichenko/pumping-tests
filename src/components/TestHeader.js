@@ -4,7 +4,7 @@ import { Typography } from '@mui/material';
 function TestHeader({ title }) {
   return (
     <>
-      <Typography variant="overline">Тест</Typography>
+      {/*<Typography variant="overline">Тест</Typography>*/}
       <Typography component="h1" variant="h4" sx={{ mb: 1.5 }}>
         {title}
       </Typography>

@@ -1,18 +1,18 @@
-import Test from './components/Test';
 import { createBrowserRouter } from 'react-router-dom';
 import Exam from './components/Exam';
 import ExamLayout from './components/ExamLayout';
-import ExamTest from "./components/ExamTest";
-import Error from "./components/Error";
+import ExamTest from './components/ExamTest';
+import Error from './components/Error';
+import Page from './components/Page';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Error error='Для загрузки теста введите правильный URL' />,
+    element: <Error error="Для загрузки теста введите правильный URL" />,
   },
   {
     path: '/:testName',
-    element: <Test />,
+    element: <Page />,
   },
   {
     path: 'exam',
@@ -20,7 +20,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Error error='Для загрузки экзамена введите правильный URL' />,
+        element: <Error error="Для загрузки экзамена введите правильный URL" />,
       },
       {
         path: ':testName',
