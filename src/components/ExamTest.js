@@ -33,15 +33,15 @@ function ExamTest() {
 
   return (
     <>
-      <Toolbar>
-        {pass && pass.score && (
+      {pass && pass.score && (
+        <Toolbar>
           <Typography variant="subtitle" color={'warning.light'} sx={{ ml: 'auto', textAlign: 'right' }}>
             {`${pass.name} ${pass.surname}, ваш максимальный результат ${Math.max(
               ...pass.score
             )}%`}
           </Typography>
-        )}
-      </Toolbar>
+        </Toolbar>
+      )}
       <Test onCheckTest={(score, examMinScore) => saveTestResult(score, examMinScore)} isExam={true}/>
     </>
   );

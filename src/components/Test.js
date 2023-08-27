@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Container } from '@mui/material';
+import { Box, Container, Tab, Tabs, Typography } from '@mui/material';
 import useRealm from '../hooks/useRealm';
 import Questions from './Questions';
-import TestHeader from './TestHeader';
 import TestResultHeader from './TestResultHeader';
 import { LoadingScreen } from './LoadingScreen';
 import Error from './Error';
 import realmService from '../services/RealmService';
 import storeService from '../services/StorageService';
+import Material from './Material';
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div hidden={value !== index} {...other}>
+      {value === index && <>{children}</>}
+    </div>
+  );
+}
 
 function Test({ onCheckTest, isExam }) {
   const { realmFunctions, testsCol, questionsCol } = useRealm();
@@ -16,6 +26,7 @@ function Test({ onCheckTest, isExam }) {
 
   const [test, setTest] = useState(null);
   const [testResults, setTestResults] = useState(null);
+  const [value, setValue] = useState(0);
   const [error, setError] = useState('');
 
   const checkTest = (results) => {
@@ -30,6 +41,10 @@ function Test({ onCheckTest, isExam }) {
 
       window.scrollTo(0, 0);
     });
+  };
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
   };
 
   useEffect(() => {
@@ -75,33 +90,55 @@ function Test({ onCheckTest, isExam }) {
     return <LoadingScreen />;
   }
 
+  const material = test.material[0];
+
   return (
-    <Container maxWidth="md" sx={{ py: { xs: 4, md: 10 } }}>
-      <Box component="header" sx={{ mb: 5 }}>
-        {!testResults ? (
-          <TestHeader title={test.title} />
-        ) : (
-          <TestResultHeader
-            title={test.title}
-            examMinScore={test.exam}
-            total={test.questionsData.length}
-            levels={test.levels}
-            result={testResults}
-          />
-        )}
+    <Container maxWidth="md" sx={{ py: { xs: 10, md: 12 } }}>
+      <Typography component="h1" variant="h4" sx={{ mb: { xs: 3, md: 4 } }}>
+        {test.title}
+      </Typography>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
+        <Tabs value={value} centered variant="fullWidth" onChange={handleChange}>
+          <Tab label="Тест" />
+          {!!material && <Tab label="Текст урока" />}
+        </Tabs>
       </Box>
-      <Questions
-        testName={testName}
-        questions={test.questionsData}
-        wrongAnsweredQuestionIds={testResults && testResults.wrongQuestionsIds}
-        onSubmit={checkTest}
-        onReset={() => {
-          setTestResults(null);
-          storeService.setTestResults(testName, null);
-          setTest(null);
-          storeService.setTest(testName, null);
-        }}
-      />
+      <TabPanel value={value} index={0}>
+        <Box sx={{ mb: 3 }}>
+          {!testResults ? (
+            <Typography component="p" variant="subtitle1" textAlign="justify">
+              В одном вопросе может быть несколько правильных ответов. Правильные ответы повышают, а неправильные —
+              уменьшают оценку. После проверки вопрос будет выделен красным, если вы указали хотя бы один лишний или не
+              доуказали хотя бы один правильный ответ.
+            </Typography>
+          ) : (
+            <TestResultHeader
+              title={test.title}
+              examMinScore={test.exam}
+              total={test.questionsData.length}
+              levels={test.levels}
+              result={testResults}
+            />
+          )}
+        </Box>
+        <Questions
+          testName={testName}
+          questions={test.questionsData}
+          wrongAnsweredQuestionIds={testResults && testResults.wrongQuestionsIds}
+          onSubmit={checkTest}
+          onReset={() => {
+            setTestResults(null);
+            storeService.setTestResults(testName, null);
+            setTest(null);
+            storeService.setTest(testName, null);
+          }}
+        />
+      </TabPanel>
+      {!!material && (
+        <TabPanel value={value} index={1}>
+          <Material content={material.content} />
+        </TabPanel>
+      )}
     </Container>
   );
 }

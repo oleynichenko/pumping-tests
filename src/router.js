@@ -3,7 +3,7 @@ import Exam from './components/Exam';
 import ExamLayout from './components/ExamLayout';
 import ExamTest from './components/ExamTest';
 import Error from './components/Error';
-import Page from './components/Page';
+import Test from './components/Test';
 
 const router = createBrowserRouter([
   {
@@ -12,7 +12,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/:testName',
-    element: <Page />,
+    element: <Test />,
   },
   {
     path: 'exam',
