@@ -102,7 +102,7 @@ function Test({ onCheckTest, isExam }) {
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
         <Tabs value={value} centered variant="fullWidth" onChange={handleChange}>
           <Tab label="Тест" />
-          {!!material && <Tab label="Текст урока" />}
+          {!!material && <Tab label="Урок" />}
           {!!isDictionary && <Tab label="Словарь" />}
         </Tabs>
       </Box>
