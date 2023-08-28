@@ -55,6 +55,13 @@ class RealmService {
           as: "material"
         }
       },
+      { $lookup: {
+          from: 'terms',
+          localField: 'questions.themes',
+          foreignField: "theme",
+          as: "terms"
+        }
+      },
       {
         $project: {
           title: 1,
@@ -67,7 +74,8 @@ class RealmService {
           'levels.conclusionPhrase': 1,
           'levels.score': 1,
           'levels.color': 1,
-          'material.content': 1
+          'material.content': 1,
+          terms: 1
         },
       },
     ];

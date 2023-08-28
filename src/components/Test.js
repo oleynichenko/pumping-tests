@@ -9,6 +9,7 @@ import Error from './Error';
 import realmService from '../services/RealmService';
 import storeService from '../services/StorageService';
 import Material from './Material';
+import Terms from "./Terms";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -91,6 +92,7 @@ function Test({ onCheckTest, isExam }) {
   }
 
   const material = test.material && test.material[0];
+  const isDictionary = test.terms && test.terms.length;
 
   return (
     <Container maxWidth="md" sx={{ py: { xs: 10, md: 12 } }}>
@@ -101,6 +103,7 @@ function Test({ onCheckTest, isExam }) {
         <Tabs value={value} centered variant="fullWidth" onChange={handleChange}>
           <Tab label="Тест" />
           {!!material && <Tab label="Текст урока" />}
+          {!!isDictionary && <Tab label="Словарь" />}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -137,6 +140,11 @@ function Test({ onCheckTest, isExam }) {
       {!!material && (
         <TabPanel value={value} index={1}>
           <Material content={material.content} />
+        </TabPanel>
+      )}
+      {!!isDictionary && (
+        <TabPanel value={value} index={2}>
+          <Terms data={test.terms} />
         </TabPanel>
       )}
     </Container>
