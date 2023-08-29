@@ -8,6 +8,12 @@ const RootStyle = styled('section')(({ theme }) => ({
     marginTop: 24,
     marginBottom: 12,
   },
+  '& p + ul': {
+    marginTop: -14,
+  },
+  '& li': {
+    ...theme.typography.body1,
+  },
   '& p': {
     ...theme.typography.body1,
     marginTop: 0,

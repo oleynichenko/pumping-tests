@@ -143,7 +143,7 @@ function Test({ onCheckTest, isExam }) {
         </TabPanel>
       )}
       {!!isDictionary && (
-        <TabPanel value={value} index={2}>
+        <TabPanel value={value} index={!material ? 1: 2}>
           <Terms data={test.terms} />
         </TabPanel>
       )}

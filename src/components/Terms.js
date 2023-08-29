@@ -8,7 +8,7 @@ function Terms({ data }) {
   return (
     <List dense={false}>
       {sortedData.map((item) => (
-        <ListItem>
+        <ListItem key={item.term}>
           <ListItemText primary={`${item.term} – ${item.definition}`} />
         </ListItem>
       ))}

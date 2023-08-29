@@ -50,8 +50,8 @@ class RealmService {
       { $match: { 'links.permalink': permalink } },
       { $lookup: {
           from: 'materials',
-          localField: 'materialId',
-          foreignField: "id",
+          localField: 'questions.themes',
+          foreignField: "theme",
           as: "material"
         }
       },
