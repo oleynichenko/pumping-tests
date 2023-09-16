@@ -91,7 +91,7 @@ function Test({ onCheckTest, isExam }) {
     return <LoadingScreen />;
   }
 
-  const material = test.material && test.material[0];
+  const material = test.material && test.material.reduce((res, item) => res + item.content, '');
   const isDictionary = test.terms && test.terms.length;
 
   return (
@@ -139,7 +139,7 @@ function Test({ onCheckTest, isExam }) {
       </TabPanel>
       {!!material && (
         <TabPanel value={value} index={1}>
-          <Material content={material.content} />
+          <Material content={material} />
         </TabPanel>
       )}
       {!!isDictionary && (
