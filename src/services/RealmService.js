@@ -34,6 +34,40 @@ class RealmService {
     return collection.find(filter, { sort: { updated: -1 } });
   }
 
+  async getExamsResult(collection, permalinks, minScore) {
+    const pipeline = [
+      {
+        $match: {
+          permalink: { $in: permalinks },
+          score: { $gte: minScore },
+          // passDate: { $gte: minScore }, TODO add limit for pass dates and sort out update date vs result
+        },
+      },
+      {
+        $group: {
+          _id: '$email',
+          passes: {
+            $push: {
+              name: "$name",
+              surname: "$surname",
+              score: "$score",
+              permalink: "$permalink",
+            }
+          }
+        }
+      }
+    ];
+
+    return collection.aggregate(pipeline)
+      .then((data) => {
+        if (!data || data.length === 0) {
+          throw new Error('Теста с таким URL не существует');
+        }
+
+        return JSON.parse(JSON.stringify(data));
+      });
+  }
+
   async getPass(collection, email, permalink) {
     const filter = {
       email,
@@ -53,15 +87,13 @@ class RealmService {
           localField: 'questions.themes',
           foreignField: "theme",
           as: "material"
-        }
-      },
+        } },
       { $lookup: {
           from: 'terms',
           localField: 'questions.themes',
           foreignField: "theme",
           as: "terms"
-        }
-      },
+        } },
       {
         $project: {
           title: 1,
@@ -107,6 +139,28 @@ class RealmService {
         .then((questionsData) => {
           return { ...testData, questionsData };
         });
+    });
+  }
+
+  async getTestTitles(testsCollection, permalinks) {
+    const pipeline = [
+      { $match: { 'links.permalink': { $in: permalinks } } },
+      { $unwind: `$links` },
+      { $match: { 'links.permalink': { $in: permalinks } } },
+      {
+        $project: {
+          title: 1,
+          'links.permalink': 1
+        },
+      },
+    ];
+
+    return testsCollection.aggregate(pipeline).then((data) => {
+      if (!data || data.length === 0) {
+        throw new Error('Тестов для такого URL не существует');
+      }
+
+      return JSON.parse(JSON.stringify(data));
     });
   }
 
