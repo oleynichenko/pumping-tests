@@ -4,6 +4,7 @@ import ExamLayout from './components/ExamLayout';
 import ExamTest from './components/ExamTest';
 import Error from './components/Error';
 import Test from './components/Test';
+import ExamsResult from './components/ExamsResult';
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
         element: <ExamTest />,
       },
     ],
+  },
+  {
+    path: 'results/:examsList',
+    element: <ExamsResult />,
   },
 ]);
 
