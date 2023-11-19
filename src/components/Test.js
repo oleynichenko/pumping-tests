@@ -9,7 +9,7 @@ import Error from './Error';
 import realmService from '../services/RealmService';
 import storeService from '../services/StorageService';
 import Material from './Material';
-import Terms from "./Terms";
+import Terms from './Terms';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -143,7 +143,7 @@ function Test({ onCheckTest, isExam }) {
         </TabPanel>
       )}
       {!!isDictionary && (
-        <TabPanel value={value} index={!material ? 1: 2}>
+        <TabPanel value={value} index={!material ? 1 : 2}>
           <Terms data={test.terms} />
         </TabPanel>
       )}

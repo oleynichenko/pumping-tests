@@ -25,6 +25,13 @@ const RootStyle = styled('section')(({ theme }) => ({
     marginTop: 0,
     marginBottom: 16,
   },
+  '& em': {
+    display: 'block',
+    ...theme.typography.body2,
+    marginTop: -8,
+    marginBottom: 32,
+    textAlign: 'right',
+  },
 }));
 
 function Material({ content }) {
