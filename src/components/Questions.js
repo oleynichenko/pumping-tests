@@ -88,7 +88,7 @@ function Questions({ testName, questions = [], wrongAnsweredQuestionIds, onSubmi
           Пересдать
         </Button>
       ) : (
-        <LoadingButton variant="contained" onClick={handleSubmit} disabled={!valid} loading={checking}>
+        <LoadingButton variant="contained" onClick={handleSubmit} disabled={!valid || !questions.length} loading={checking}>
           Отправить на проверку
         </LoadingButton>
       )}
