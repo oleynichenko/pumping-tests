@@ -10,6 +10,8 @@ function TestResultHeader({ result, levels, total }) {
   const questionsWording = getNumEnding(total, QUESTION);
   const scoreWording = getNumEnding(pointsScored, SCORE);
 
+  const recommendationText = level?.recommendation?.data && level?.recommendation?.data !== 'common' ? level.recommendation.data : null;
+
   return (
     <>
       <Typography variant="overline" component="p" textAlign="center">{`Результаты от ${today}`}</Typography>
@@ -28,8 +30,13 @@ function TestResultHeader({ result, levels, total }) {
         </Typography>
       </Stack>
       {level && level.feedback && (
-        <Typography component="p" sx={{ mt: 2, textAlign: 'justify' }}>
+        <Typography component="p" sx={{ mt: 3, textAlign: 'center' }}>
           {level.feedback.data || level.feedback}
+        </Typography>
+      )}
+      {recommendationText && (
+        <Typography component="p" sx={{ mt: 2, textAlign: 'justify' }}>
+          {recommendationText}
         </Typography>
       )}
     </>

@@ -104,6 +104,7 @@ class RealmService {
           'levels.name': 1,
           'levels.feedback': 1,
           'levels.conclusionPhrase': 1,
+          'levels.recommendation': 1,
           'levels.score': 1,
           'levels.color': 1,
           'material.content': 1,
