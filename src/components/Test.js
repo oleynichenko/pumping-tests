@@ -109,11 +109,18 @@ function Test({ onCheckTest, isExam }) {
       <TabPanel value={value} index={0}>
         <Box sx={{ mb: 3 }}>
           {!testResults ? (
-            <Typography component="p" variant="subtitle1" textAlign="justify">
-              В одном вопросе может быть несколько правильных ответов. Правильные ответы повышают, а неправильные —
-              уменьшают оценку. После проверки вопрос будет выделен красным, если вы указали хотя бы один лишний или не
-              доуказали хотя бы один правильный ответ.
-            </Typography>
+            <>
+              <Typography component="p" variant="subtitle1" textAlign="justify">
+                В одном вопросе может быть несколько правильных ответов. Правильные ответы повышают, а неправильные —
+                уменьшают оценку. После проверки вопрос будет выделен красным, если вы указали хотя бы один лишний или не
+                доуказали хотя бы один правильный ответ.
+              </Typography>
+              {test.additionalInfo && (
+                <Typography component="p" sx={{ mt: 1 }} variant="subtitle1" textAlign="justify">
+                  {test.additionalInfo}
+                </Typography>
+              )}
+            </>
           ) : (
             <TestResultHeader
               title={test.title}

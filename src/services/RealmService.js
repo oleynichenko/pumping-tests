@@ -98,6 +98,7 @@ class RealmService {
         $project: {
           title: 1,
           description: 1,
+          additionalInfo: 1,
           links: 1,
           exam: 1,
           questions: 1,
